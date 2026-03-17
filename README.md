@@ -61,10 +61,24 @@ Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par l
 
 | Champ | Description |
 |---|---|
-| Token d'accès GitHub | Personal Access Token (PAT) avec scope `repo` |
-| Nom d'utilisateur GitHub | Votre username GitHub |
+| Token d'accès GitHub | Personal Access Token (PAT) avec scope `repo` (voir guide ci-dessous) |
+| Nom d'utilisateur GitHub | Votre username GitHub (ex : `umaniweb`) |
+| URL du serveur | Non utilisé actuellement — laisser vide |
 
-Pour créer un token : **GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)** → scope `repo`.
+#### Créer un Personal Access Token sur GitHub
+
+1. Aller sur **github.com → cliquer sur votre avatar (en haut à droite) → Settings**
+   *(il s'agit des settings du compte, pas du dépôt)*
+2. Dans le menu de gauche, tout en bas : **Developer settings**
+3. **Personal access tokens → Tokens (classic)**
+   *(ne pas utiliser "Fine-grained tokens" — non supporté par l'Updater)*
+4. Cliquer **Generate new token → Generate new token (classic)**
+5. Dans le champ **Note**, saisir un nom descriptif, par exemple : `umani-cookie-control-updater`
+6. Dans **Select scopes**, cocher uniquement **`repo`** (accès complet aux dépôts)
+7. Cliquer **Generate token** en bas de page
+8. **Copier immédiatement le token affiché** — il ne sera plus visible après avoir quitté la page
+
+Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour du plugin.
 
 ---
 
