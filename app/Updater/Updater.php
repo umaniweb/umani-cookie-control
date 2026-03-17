@@ -45,9 +45,10 @@ class Updater
 
     private function initPluginData(string $file): void
     {
-        add_action('admin_init', function () use ($file) {
-            $this->pluginData = \get_plugin_data($file);
-        });
+        if (!function_exists('get_plugin_data')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        $this->pluginData = \get_plugin_data($file);
     }
 
     private function isAuthenticated(): bool
