@@ -15,7 +15,7 @@ namespace UMANI;
 
 defined('ABSPATH') || exit;
 
-define('UMANI_CC_VERSION', '2.0.0');
+define('UMANI_CC_VERSION', '2.0.1');
 define('UMANI_CC_FILE', __FILE__);
 define('UMANI_CC_DIR', __DIR__);
 define('UMANI_CC_URL', plugin_dir_url(__FILE__));
