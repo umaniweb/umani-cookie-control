@@ -185,6 +185,7 @@ class Updater
 
         $wp_filesystem->move($result['destination'], $this->pluginDirPath);
         $result['destination'] = $this->pluginDirPath;
+        $result['destination_name'] = basename($this->pluginDirPath);
 
         if ($this->pluginActivated) {
             activate_plugin($this->pluginFile);
