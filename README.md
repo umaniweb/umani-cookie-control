@@ -22,6 +22,8 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 3. Activer le plugin
 4. Configurer dans **Cookie Consent** dans le menu admin
 
+> Le dossier `vendor/` (autoload Composer) est inclus dans le dépôt — aucune commande `composer install` n'est nécessaire après installation.
+
 ---
 
 ## Configuration
@@ -86,11 +88,17 @@ Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour 
 
 ### Étape 1 — Incrémenter la version
 
-Dans `umani-cookie-control.php`, mettre à jour la ligne :
+Dans `umani-cookie-control.php`, mettre à jour **les deux lignes suivantes** avec la même valeur :
 
 ```php
- * Version: 2.x.x
+ * Version:            2.x.x
 ```
+
+```php
+define('UMANI_CC_VERSION', '2.x.x');
+```
+
+> Ces deux valeurs doivent être **identiques** entre elles et correspondre exactement au tag GitHub. Le header est utilisé par WordPress pour détecter la mise à jour ; la constante sert au cache-busting des assets CSS/JS.
 
 ### Étape 2 — Committer et pousser
 
