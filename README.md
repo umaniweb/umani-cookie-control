@@ -86,7 +86,13 @@ Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour 
 
 ## Publier une nouvelle version
 
-### Étape 1 — Incrémenter la version
+### Étape 1 — Modifier le code
+
+Effectuer toutes les modifications souhaitées dans les fichiers du plugin.
+
+> Si tu relances `git commit` sans avoir modifié de fichiers, git répondra "rien à valider, la copie de travail est propre" — c'est normal. Il faut toujours avoir des changements à committer avant de lancer les commandes git.
+
+### Étape 2 — Incrémenter la version
 
 Dans `umani-cookie-control.php`, mettre à jour **les deux lignes suivantes** avec la même valeur :
 
@@ -100,7 +106,7 @@ define('UMANI_CC_VERSION', '2.x.x');
 
 > Ces deux valeurs doivent être **identiques** entre elles et correspondre exactement au tag GitHub. Le header est utilisé par WordPress pour détecter la mise à jour ; la constante sert au cache-busting des assets CSS/JS.
 
-### Étape 2 — Committer et pousser
+### Étape 3 — Committer et pousser
 
 ```bash
 git add -A
@@ -108,7 +114,9 @@ git commit -m "v2.x.x — description des changements"
 git push origin main
 ```
 
-### Étape 3 — Créer une Release sur GitHub
+> **En cas de message "rien à valider"** : tu as soit oublié de modifier des fichiers (étape 1), soit relancé les commandes après un push déjà réussi. Vérifier avec `git log --oneline -3` si le commit existe déjà.
+
+### Étape 4 — Créer une Release sur GitHub
 
 1. Aller dans **Releases → Create a new release**
 2. **Tag** : `2.x.x` — doit correspondre **exactement** à la version dans le header du plugin
