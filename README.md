@@ -106,7 +106,7 @@ Apporter les modifications souhaitées dans les fichiers du plugin.
 Dans `umani-cookie-control.php`, mettre à jour **les deux lignes suivantes** avec la même valeur :
 
 ```php
- * Version:            2.x.x
+ * Version: 2.x.x
 ```
 
 ```php

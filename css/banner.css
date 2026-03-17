@@ -124,6 +124,11 @@
     margin-bottom: 18px !important;
 }
 
+#umani-cc-banner .umani-cc-category-name-desc {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
 #umani-cc-banner .umani-cc-category {
     display: flex !important;
     flex-direction: column !important;
@@ -133,7 +138,6 @@
 
 #umani-cc-banner .umani-cc-category-header {
     display: flex !important;
-    align-items: center !important;
     gap: 10px !important;
 }
 
@@ -145,7 +149,6 @@
 #umani-cc-banner .umani-cc-category-desc {
     font-size: 12px !important;
     opacity: 0.7 !important;
-    padding-left: 30px !important;
 }
 
 /* ---- Toggle switch ---- */
@@ -160,6 +163,7 @@
     cursor: pointer !important;
     transition: background 0.25s !important;
     flex-shrink: 0 !important;
+    margin-top: 1px !important;
 }
 
 #umani-cc-banner .umani-cc-toggle::after {
