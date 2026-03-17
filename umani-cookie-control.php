@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name:        UmaniWeb Cookie Control
- * Version:            2.0.0
+ * Version:            2.0.1
  * Description:        Bannière de consentement RGPD avec Consent Mode v2, granularité par catégorie, et injection de code head/body.
  * Author:             UmaniWeb
  * Author URI:         https://www.umaniweb.com/
