@@ -211,11 +211,11 @@ class Front
 
         return [
             'bannerText'            => $this->getI18nOption('banner-text', $lang) ?: $this->getDefaultBannerText(),
-            'textAccept'            => $this->getI18nOption('banner-accept-text', $lang) ?: 'Accepter tout',
-            'textReject'            => $this->getI18nOption('banner-reject-text', $lang) ?: 'Refuser',
-            'textReadMore'          => $this->getI18nOption('banner-readMore-text', $lang) ?: 'Politique de confidentialité',
-            'textSettings'          => $this->getI18nOption('banner-settings-text', $lang) ?: 'Paramétrer',
-            'textSave'              => $this->getI18nOption('banner-save-text', $lang) ?: 'Sauvegarder',
+            'textAccept'            => $this->getI18nOption('banner-accept-text', $lang) ?: $this->i18n->getDefault(['fr' => 'Accepter tout', 'en' => 'Accept all', 'es' => 'Aceptar todo'], $currentLang),
+            'textReject'            => $this->getI18nOption('banner-reject-text', $lang) ?: $this->i18n->getDefault(['fr' => 'Refuser', 'en' => 'Reject', 'es' => 'Rechazar'], $currentLang),
+            'textReadMore'          => $this->getI18nOption('banner-readMore-text', $lang) ?: $this->i18n->getDefault(['fr' => 'Politique de confidentialité', 'en' => 'Privacy policy', 'es' => 'Política de privacidad'], $currentLang),
+            'textSettings'          => $this->getI18nOption('banner-settings-text', $lang) ?: $this->i18n->getDefault(['fr' => 'Paramétrer', 'en' => 'Settings', 'es' => 'Configurar'], $currentLang),
+            'textSave'              => $this->getI18nOption('banner-save-text', $lang) ?: $this->i18n->getDefault(['fr' => 'Sauvegarder', 'en' => 'Save', 'es' => 'Guardar'], $currentLang),
             'privacyPageUrl'        => $this->getPrivacyPageUrl(),
             'bannerColor'           => sanitize_hex_color($this->getOption('banner-color') ?: '') ?: '#FFFFFF',
             'bannerTextColor'       => sanitize_hex_color($this->getOption('banner-text-color') ?: '') ?: '#333333',
@@ -269,6 +269,10 @@ class Front
         $pageId = get_option('wp_page_for_privacy_policy');
         if (!$pageId || get_post_status($pageId) !== 'publish') {
             return '';
+        }
+
+        if ($this->i18n->hasWpml()) {
+            $pageId = apply_filters('wpml_object_id', $pageId, 'page', true);
         }
 
         return get_permalink($pageId) ?: '';
