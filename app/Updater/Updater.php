@@ -27,7 +27,7 @@ class Updater
         $this->pluginDirPath = plugin_dir_path($file);
         $this->pluginFile = plugin_basename($file);
         $this->gitHubUsername = $gitHubUsername;
-        $this->repositoryName = $this->pluginSlug;
+        $this->repositoryName = 'umani-cookie-control';
         $this->accessToken = $accessToken;
 
         $this->initPluginData($file);
