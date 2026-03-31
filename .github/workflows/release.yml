@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Créer le zip
+        run: |
+          mkdir -p umani-cookie-control
+          rsync -av --exclude='.git' --exclude='.github' . umani-cookie-control/
+          zip -r umani-cookie-control.zip umani-cookie-control/
+
+      - name: Attacher au release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: umani-cookie-control.zip
+```
+
+Ensuite pour créer une release tu fais :
+```
+git tag v2.0.7
+git push origin v2.0.7
