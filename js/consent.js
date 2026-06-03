@@ -15,7 +15,7 @@
         d.setTime(d.getTime() + days * 86400000);
         document.cookie = name + '=' + encodeURIComponent(value) +
             ';expires=' + d.toUTCString() +
-            ';path=/;SameSite=Lax';
+            ';path=/;SameSite=Lax;Secure';
     }
 
     function getSavedConsent() {
@@ -78,7 +78,7 @@
         }
 
         // Remove legacy cookie
-        document.cookie = 'cookie_consent=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+        document.cookie = 'cookie_consent=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;Secure';
     }
 
     function hideBanner() {
