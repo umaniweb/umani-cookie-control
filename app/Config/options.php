@@ -7,6 +7,13 @@ return [
         'section_title' => 'Code GTM<br><small>Il est possible d\'ajouter du code qui n\'a pas de rapport avec GTM.</small>',
         'page'          => 'code-insertion',
         'fields'        => [
+            'tag-id' => [
+                'type'       => 'string',
+                'render'     => 'input',
+                'input_type' => 'text',
+                'label'      => 'ID Google Tag Manager ou Google Analytics<br><small>Format GTM-XXXXXXX ou G-XXXXXXXXXX. Le snippet correspondant est injecté automatiquement, avant le code ci-dessous.</small>',
+                'sanitize'   => ['UMANI\\Tag\\TagId', 'sanitize'],
+            ],
             'head' => [
                 'type'     => 'string',
                 'render'   => 'codeEditor',

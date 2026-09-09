@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UMANI;
 
 use UMANI\I18n\I18nService;
+use UMANI\Tag\TagId;
 
 class Front
 {
@@ -41,6 +42,8 @@ class Front
             $this->renderConsentModeUpdate();
         }
 
+        $this->renderTagSnippet();
+
         $headCode = $this->getOption('head');
         if ($headCode) {
             echo $headCode;
@@ -49,6 +52,8 @@ class Front
 
     public function renderBodyCode(): void
     {
+        $this->renderTagNoscript();
+
         $bodyCode = $this->getOption('body');
         if ($bodyCode) {
             echo $bodyCode;
@@ -117,6 +122,51 @@ class Front
         wp_localize_script('umani-cc-consent', 'umaniCC', [
             'categories' => $categoriesForJs,
         ]);
+    }
+
+    private function renderTagSnippet(): void
+    {
+        $id = $this->getTagId();
+        $type = TagId::type($id);
+
+        if ($type === 'gtm') {
+            ?>
+            <!-- Umani Cookie Control - Google Tag Manager -->
+            <script>
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+            var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+            j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+            f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','<?php echo esc_js($id); ?>');
+            </script>
+            <?php
+            return;
+        }
+
+        if ($type === 'ga4') {
+            ?>
+            <!-- Umani Cookie Control - Google Analytics 4 -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr($id); ?>"></script>
+            <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '<?php echo esc_js($id); ?>');
+            </script>
+            <?php
+        }
+    }
+
+    private function renderTagNoscript(): void
+    {
+        $id = $this->getTagId();
+
+        if (TagId::type($id) !== 'gtm') {
+            return;
+        }
+        ?>
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=<?php echo esc_attr($id); ?>"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <?php
     }
 
     private function renderConsentModeDefault(): void
@@ -233,6 +283,11 @@ class Front
         return (bool) $this->getOption('banner-active')
             && $privacyPage
             && get_post_status($privacyPage) === 'publish';
+    }
+
+    private function getTagId(): string
+    {
+        return strtoupper(trim((string) ($this->getOption('tag-id') ?: '')));
     }
 
     private function getOption(string $name): mixed
