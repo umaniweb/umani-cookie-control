@@ -30,7 +30,7 @@ class OptionRegistrar
             add_settings_section(
                 $sectionId,
                 $section['section_title'],
-                '__return_false',
+                $this->sectionCallback($section['section_description'] ?? ''),
                 $page,
                 $section['section_args'] ?? []
             );
@@ -39,6 +39,17 @@ class OptionRegistrar
                 $this->registerField($fieldKey, $field, $page, $sectionId);
             }
         }
+    }
+
+    private function sectionCallback(string $description): \Closure
+    {
+        return static function () use ($description): void {
+            if ($description === '') {
+                return;
+            }
+
+            printf('<p class="description">%s</p>', wp_kses_post($description));
+        };
     }
 
     private function registerField(string $fieldKey, array $field, string $page, string $sectionId): void
@@ -81,9 +92,10 @@ class OptionRegistrar
             $page,
             $sectionId,
             [
-                'label_for'  => $optionName,
-                'render'     => $field['render'],
-                'input_type' => $field['input_type'] ?? 'text',
+                'label_for'   => $optionName,
+                'render'      => $field['render'],
+                'input_type'  => $field['input_type'] ?? 'text',
+                'description' => $field['description'] ?? '',
             ]
         );
     }
@@ -119,9 +131,10 @@ class OptionRegistrar
                 $page,
                 $sectionId,
                 [
-                    'label_for'  => $optionName,
-                    'render'     => $isCurrentLang ? $field['render'] : 'input',
-                    'input_type' => $isCurrentLang ? ($field['input_type'] ?? 'text') : 'hidden',
+                    'label_for'   => $optionName,
+                    'render'      => $isCurrentLang ? $field['render'] : 'input',
+                    'input_type'  => $isCurrentLang ? ($field['input_type'] ?? 'text') : 'hidden',
+                    'description' => $isCurrentLang ? ($field['description'] ?? '') : '',
                 ]
             );
         }

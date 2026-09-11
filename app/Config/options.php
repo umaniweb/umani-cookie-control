@@ -3,28 +3,39 @@
 declare(strict_types=1);
 
 return [
-    'code-insertion' => [
-        'section_title' => 'Code GTM<br><small>Il est possible d\'ajouter du code qui n\'a pas de rapport avec GTM.</small>',
-        'page'          => 'code-insertion',
-        'fields'        => [
+    'google-tag' => [
+        'section_title'       => 'Tag Google',
+        'section_description' => 'Identifiant du conteneur Tag Manager ou de la propriété Analytics. Le snippet correspondant est généré et inséré automatiquement, juste après l\'initialisation du Consent Mode v2.',
+        'page'                => 'code-insertion',
+        'fields'              => [
             'tag-id' => [
-                'type'       => 'string',
-                'render'     => 'input',
-                'input_type' => 'text',
-                'label'      => 'ID Google Tag Manager ou Google Analytics<br><small>Format GTM-XXXXXXX ou G-XXXXXXXXXX. Le snippet correspondant est injecté automatiquement, avant le code ci-dessous.</small>',
-                'sanitize'   => ['UMANI\\Tag\\TagId', 'sanitize'],
+                'type'        => 'string',
+                'render'      => 'input',
+                'input_type'  => 'text',
+                'label'       => 'Identifiant du tag',
+                'description' => 'Format <code>GTM-XXXXXXX</code> pour Tag Manager, <code>G-XXXXXXXXXX</code> pour Analytics 4. Laissez vide pour coller vous-même votre snippet dans le champ &lt;head&gt; ci-dessous.',
+                'sanitize'    => ['UMANI\\Tag\\TagId', 'sanitize'],
             ],
+        ],
+    ],
+    'code-insertion' => [
+        'section_title'       => 'Code personnalisé',
+        'section_description' => 'Pour tout code non couvert par le champ ci-dessus : autre solution de mesure, pixel publicitaire, balise de vérification de domaine.',
+        'page'                => 'code-insertion',
+        'fields'              => [
             'head' => [
-                'type'     => 'string',
-                'render'   => 'codeEditor',
-                'label'    => 'Code HTML à insérer dans le &lt;head&gt;',
-                'sanitize' => null,
+                'type'        => 'string',
+                'render'      => 'codeEditor',
+                'label'       => 'Balise &lt;head&gt;',
+                'description' => 'Inséré en début de &lt;head&gt;, après le Consent Mode v2 et le tag Google.',
+                'sanitize'    => null,
             ],
             'body' => [
-                'type'     => 'string',
-                'render'   => 'codeEditor',
-                'label'    => 'Code HTML à insérer dans le &lt;body&gt;',
-                'sanitize' => null,
+                'type'        => 'string',
+                'render'      => 'codeEditor',
+                'label'       => 'Balise &lt;body&gt;',
+                'description' => 'Inséré à l\'ouverture de &lt;body&gt;, ou en pied de page si le thème ne déclare pas <code>wp_body_open</code>.',
+                'sanitize'    => null,
             ],
         ],
     ],
@@ -33,10 +44,11 @@ return [
         'page'          => 'banner',
         'fields'        => [
             'banner-active' => [
-                'type'     => 'integer',
-                'render'   => 'checkbox',
-                'label'    => 'Activer la bannière',
-                'sanitize' => 'absint',
+                'type'        => 'integer',
+                'render'      => 'checkbox',
+                'label'       => 'Activer la bannière',
+                'description' => 'La bannière s\'affiche en façade uniquement si une page de politique de confidentialité est publiée dans <strong>Réglages &rsaquo; Vie privée</strong>.',
+                'sanitize'    => 'absint',
             ],
         ],
     ],
@@ -186,22 +198,24 @@ return [
         ],
     ],
     'updater-settings' => [
-        'section_title' => '',
-        'page'          => 'updater-settings',
-        'fields'        => [
-            'token' => [
-                'type'       => 'string',
-                'render'     => 'input',
-                'input_type' => 'password',
-                'label'      => 'Token d\'accès GitHub',
-                'sanitize'   => 'sanitize_text_field',
-            ],
+        'section_title'       => 'Connexion GitHub',
+        'section_description' => 'Identifiants utilisés pour vérifier la présence d\'une nouvelle version du plugin et la télécharger. Sans ces informations, aucune mise à jour automatique n\'est proposée.',
+        'page'                => 'updater-settings',
+        'fields'              => [
             'username' => [
                 'type'       => 'string',
                 'render'     => 'input',
                 'input_type' => 'text',
                 'label'      => 'Nom d\'utilisateur GitHub',
                 'sanitize'   => 'sanitize_text_field',
+            ],
+            'token' => [
+                'type'        => 'string',
+                'render'      => 'input',
+                'input_type'  => 'password',
+                'label'       => 'Token d\'accès GitHub',
+                'description' => 'Token personnel disposant de l\'accès en lecture au dépôt du plugin.',
+                'sanitize'    => 'sanitize_text_field',
             ],
             'server' => [
                 'type'       => 'string',

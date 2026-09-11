@@ -10,7 +10,8 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 - **Consent Mode v2** complet : `ad_storage`, `ad_user_data`, `ad_personalization`, `analytics_storage`, `personalization_storage`, `functionality_storage`, `security_storage`
 - Choix granulaire par catégorie : **Nécessaires** · **Analytiques** · **Marketing**
 - Compatible **WPML** (textes multilingues)
-- Injection de code arbitraire dans `<head>` et `<body>` (GTM ou autre)
+- Insertion automatique du tag Google depuis un simple identifiant : `GTM-XXXXXXX` (Tag Manager) ou `G-XXXXXXXXXX` (Analytics 4)
+- Injection de code arbitraire dans `<head>` et `<body>` (autre solution de mesure, pixel, vérification de domaine)
 - Mise à jour automatique depuis ce dépôt GitHub
 
 ---
@@ -28,7 +29,7 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 1. Télécharger la [dernière release](../../releases/latest) (fichier `.zip`)
 2. Dans WordPress : **Extensions → Ajouter → Téléverser une extension**
 3. Activer le plugin
-4. Configurer via **Cookie Consent** dans le menu d'administration
+4. Configurer via le menu **Cookies** dans l'administration
 
 > Le dossier `vendor/` (autoload Composer) est inclus dans le dépôt — aucune commande `composer install` n'est nécessaire après installation.
 
@@ -36,22 +37,31 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 
 ## Configuration
 
-### 1. Code GTM (obligatoire pour activer la bannière)
+### 1. Tag de suivi (obligatoire pour activer la bannière)
 
-**Cookie Consent → Code Insertion**
+**Cookies → Tags et code**
 
-Coller le snippet GTM dans le champ `<head>`. Le plugin initialise automatiquement le Consent Mode v2 avant ce code — il n'est pas nécessaire de l'inclure dans le snippet GTM.
+Deux façons de déclarer le tag, au choix :
 
-> Supprimer tout code GTM ou analytics préexistant sur le site avant d'insérer le nouveau snippet afin d'éviter les conflits.
+| Méthode | Quand l'utiliser |
+|---|---|
+| Champ **Identifiant du tag** | Cas courant. Saisir `GTM-XXXXXXX` ou `G-XXXXXXXXXX` : le snippet correspondant est généré et inséré automatiquement, avec le `<noscript>` de Tag Manager le cas échéant. |
+| Champ **Balise `<head>`** | Snippet non standard, ou solution de mesure autre que Google. Coller le code tel quel. |
+
+Dans les deux cas, le plugin initialise le Consent Mode v2 **avant** le tag : il n'est pas nécessaire de l'inclure dans le snippet.
+
+Le Consent Mode v2 est compris à l'identique par Tag Manager et par `gtag.js`. Un identifiant Analytics 4 seul suffit donc à faire fonctionner la bannière, sans conteneur Tag Manager.
+
+> Supprimer tout code Tag Manager ou Analytics préexistant sur le site avant de configurer le tag, afin d'éviter un double chargement.
 
 ### 2. Bannière de consentement
 
-**Cookie Consent → Consent Banner**
+**Cookies → Bannière**
 
-La bannière s'affiche uniquement si les trois conditions suivantes sont réunies :
+Le formulaire n'apparaît que si un tag est configuré et si une page de politique de confidentialité est publiée. La bannière s'affiche en façade lorsque les trois conditions suivantes sont réunies :
 
-- Un code GTM est renseigné dans l'onglet **Code Insertion**
-- Une page de politique de confidentialité est définie dans **Réglages → Vie privée**
+- Un tag est déclaré dans **Tags et code**, par identifiant ou par snippet
+- Une page de politique de confidentialité est publiée dans **Réglages > Vie privée**
 - La case **Activer la bannière** est cochée
 
 Options disponibles : texte, libellés des boutons, couleurs de fond / texte / bouton.
@@ -68,7 +78,7 @@ Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par l
 
 ### Configurer le token d'accès
 
-**Cookie Consent → Mise à jour**
+**Cookies → Mise à jour**
 
 | Champ | Description |
 |---|---|
@@ -169,6 +179,8 @@ umani-cookie-control/
 │   │   └── I18nService.php      # Gestion WPML / langue native
 │   ├── Option/
 │   │   └── OptionRegistrar.php  # Enregistrement des options WordPress
+│   ├── Tag/
+│   │   └── TagId.php            # Validation et typage de l'identifiant Google
 │   └── Updater/
 │       └── Updater.php          # Mise à jour depuis GitHub
 ├── css/

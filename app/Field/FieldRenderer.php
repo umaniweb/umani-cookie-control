@@ -18,6 +18,10 @@ class FieldRenderer
         };
 
         $this->$method($args);
+
+        if (!empty($args['description'])) {
+            printf('<p class="description">%s</p>', wp_kses_post($args['description']));
+        }
     }
 
     private function renderInput(array $args): void

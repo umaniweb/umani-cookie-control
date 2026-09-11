@@ -16,8 +16,8 @@ class Admin
     public function addMenus(): void
     {
         add_menu_page(
-            'Umani Cookie Control',
-            'Cookie Consent',
+            'Consentement cookies',
+            'Cookies',
             'manage_options',
             $this->slug . '-code-insertion',
             [$this, 'renderCodeInsertionPage'],
@@ -27,8 +27,8 @@ class Admin
 
         add_submenu_page(
             $this->slug . '-code-insertion',
-            'Code Insertion',
-            'Code Insertion',
+            'Tags et code',
+            'Tags et code',
             'manage_options',
             $this->slug . '-code-insertion',
             [$this, 'renderCodeInsertionPage']
@@ -36,8 +36,8 @@ class Admin
 
         add_submenu_page(
             $this->slug . '-code-insertion',
-            'Consent Banner',
-            'Consent Banner',
+            'Bannière de consentement',
+            'Bannière',
             'manage_options',
             $this->slug . '-banner',
             [$this, 'renderBannerPage']
@@ -45,7 +45,7 @@ class Admin
 
         add_submenu_page(
             $this->slug . '-code-insertion',
-            'Updater Settings',
+            'Mise à jour',
             'Mise à jour',
             'manage_options',
             $this->slug . '-updater-settings',
@@ -55,14 +55,15 @@ class Admin
 
     public function renderCodeInsertionPage(): void
     {
-        $this->addCodeInsertionNotices();
+        $state = $this->getSetupState();
+        $this->addCodeInsertionNotices($state);
         include UMANI_CC_DIR . '/views/admin/page-code-insertion.php';
     }
 
     public function renderBannerPage(): void
     {
-        $this->addBannerNotices();
-        $slug = $this->slug;
+        $state = $this->getSetupState();
+        $this->addBannerNotices($state);
         include UMANI_CC_DIR . '/views/admin/page-banner.php';
     }
 
@@ -109,16 +110,28 @@ class Admin
         <?php
     }
 
-    private function addCodeInsertionNotices(): void
+    private function getSetupState(): array
     {
-        add_action('admin_notices', function () {
+        $privacyPage = get_option('wp_page_for_privacy_policy');
+        $tagId = (string) get_option($this->slug . '-tag-id', '');
+        $headCode = (string) get_option($this->slug . '-head', '');
+
+        return [
+            'hasPrivacy'  => (bool) $privacyPage && get_post_status($privacyPage) === 'publish',
+            'hasTracking' => $tagId !== '' || trim($headCode) !== '',
+        ];
+    }
+
+    private function addCodeInsertionNotices(array $state): void
+    {
+        add_action('admin_notices', function () use ($state) {
             include UMANI_CC_DIR . '/views/admin/notices/code-insertion-notice.php';
         });
     }
 
-    private function addBannerNotices(): void
+    private function addBannerNotices(array $state): void
     {
-        add_action('admin_notices', function () {
+        add_action('admin_notices', function () use ($state) {
             include UMANI_CC_DIR . '/views/admin/notices/banner-notice.php';
         });
     }
