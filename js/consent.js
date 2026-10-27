@@ -83,13 +83,28 @@
 
     function hideBanner() {
         var wrap = document.getElementById('umani-cc-wrap');
-        if (wrap) {
-            wrap.classList.remove('umani-cc-visible');
-            wrap.addEventListener('transitionend', function handler() {
-                wrap.removeEventListener('transitionend', handler);
-                wrap.setAttribute('hidden', '');
-            });
+        if (!wrap) return;
+
+        if (!wrap.classList.contains('umani-cc-visible')) {
+            wrap.setAttribute('hidden', '');
+            return;
         }
+
+        var done = false;
+        function finish() {
+            if (done) return;
+            done = true;
+            wrap.removeEventListener('transitionend', onEnd);
+            wrap.setAttribute('hidden', '');
+        }
+        function onEnd(e) {
+            if (e.target === wrap) finish();
+        }
+
+        wrap.classList.remove('umani-cc-visible');
+        wrap.addEventListener('transitionend', onEnd);
+        // Fallback when no transition runs; must outlast the 0.4s transition in banner.css.
+        setTimeout(finish, 600);
     }
 
     function showBanner() {
