@@ -12,7 +12,7 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 - Compatible **WPML** (textes multilingues)
 - Insertion automatique du tag Google depuis un simple identifiant : `GTM-XXXXXXX` (Tag Manager) ou `G-XXXXXXXXXX` (Analytics 4)
 - Injection de code arbitraire dans `<head>` et `<body>` (autre solution de mesure, pixel, vérification de domaine)
-- Mise à jour automatique depuis ce dépôt GitHub
+- Mise à jour automatique depuis ce dépôt GitHub, sans configuration
 
 ---
 
@@ -26,15 +26,12 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 
 ## Installation
 
-Les versions publiées ne contiennent pas de fichier `.zip` prêt à l'emploi : seule l'archive des sources générée par GitHub est disponible, et son dossier porte un nom du type `umaniweb-umani-cookie-control-<commit>`. Le dossier du plugin doit s'appeler exactement `umani-cookie-control`, sans quoi les mises à jour ne sont pas détectées.
+1. Télécharger le fichier **`umani-cookie-control.zip`** de la [dernière version](../../releases/latest)
+2. Dans WordPress : **Extensions → Ajouter → Téléverser une extension**, ou décompresser le fichier dans le dossier des extensions (`wp-content/plugins/`, ou `web/app/plugins/` sur Bedrock)
+3. Activer le plugin
+4. Configurer via le menu **Cookies** dans l'administration
 
-1. Télécharger l'archive **Source code (zip)** de la [dernière version](../../releases/latest)
-2. Décompresser l'archive et renommer le dossier obtenu en `umani-cookie-control`
-3. Au choix :
-   - recompresser ce dossier, puis dans WordPress : **Extensions → Ajouter → Téléverser une extension**
-   - ou le copier dans le dossier des extensions (`wp-content/plugins/`, ou `web/app/plugins/` sur Bedrock)
-4. Activer le plugin
-5. Configurer via le menu **Cookies** dans l'administration
+Le dossier du plugin doit s'appeler exactement `umani-cookie-control`, sans quoi les mises à jour ne sont pas détectées. Le fichier `umani-cookie-control.zip` le contient déjà sous ce nom. L'archive **Source code (zip)** générée par GitHub, seule disponible pour les versions antérieures à 2.2.0, porte un nom du type `umaniweb-umani-cookie-control-<commit>` : renommer le dossier avant de l'installer.
 
 > Le dossier `vendor/` (autoload Composer) est inclus dans le dépôt : aucune commande `composer install` n'est nécessaire après installation.
 
@@ -104,35 +101,13 @@ Chaque catégorie accorde ses signaux Consent Mode :
 
 ## Mises à jour automatiques
 
-Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par le dépôt officiel WordPress. Sans nom d'utilisateur ni token, aucune mise à jour n'est proposée.
+Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par le dépôt officiel WordPress. Aucune configuration n'est nécessaire : le dépôt étant public, la dernière version est lue sans authentification sur l'API GitHub.
 
-### Configurer l'accès
+- La vérification a lieu dans l'administration, et son résultat est gardé en cache 12 heures.
+- La mise à jour s'installe depuis **Extensions**, comme pour tout plugin classique.
+- L'API GitHub accepte 60 requêtes anonymes par heure et par adresse IP : avec le cache de 12 heures, cette limite n'est pas atteinte, même avec de nombreux sites sur un même serveur.
 
-**Cookies → Mise à jour**
-
-| Champ | Description |
-|---|---|
-| Nom d'utilisateur GitHub | Propriétaire du dépôt : `umaniweb` |
-| Token d'accès GitHub | Personal Access Token (classic) **sans aucune portée** (voir guide ci-dessous) |
-| URL du serveur | Non utilisé, laisser vide |
-
-> Le dépôt étant public, le token n'a besoin d'aucun droit : il sert seulement à identifier les appels à l'API GitHub. Il est enregistré en clair dans la base de données du site, et sa valeur figure dans le code HTML de la page de réglages, lisible par tout administrateur. Ne jamais lui attribuer la portée `repo`, ni aucune autre.
-
-#### Créer un Personal Access Token sur GitHub
-
-1. Se connecter sur **github.com**, cliquer sur l'avatar en haut à droite, puis **Settings**
-   *(paramètres du compte, pas du dépôt)*
-2. Dans le menu de gauche, tout en bas : **Developer settings**
-3. **Personal access tokens → Tokens (classic)**
-   *(ne pas utiliser "Fine-grained tokens", non supporté par l'Updater)*
-4. Cliquer **Generate new token → Generate new token (classic)**
-5. Dans le champ **Note**, saisir un nom descriptif, par exemple : `umani-cookie-control-updater`
-6. Dans **Expiration**, choisir **No expiration** : un token expiré interrompt les mises à jour sans avertissement
-7. Dans **Select scopes**, ne cocher **aucune case**
-8. Cliquer **Generate token** en bas de page
-9. **Copier immédiatement le token affiché** : il ne sera plus visible après avoir quitté la page
-
-Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour du plugin. Le même token peut servir sur tous les sites.
+Depuis la version 2.2.0, la page **Cookies → Mise à jour** et ses champs (nom d'utilisateur, token, URL du serveur) n'existent plus. Les valeurs enregistrées par les versions antérieures sont supprimées de la base au premier passage dans l'administration.
 
 ---
 
@@ -175,17 +150,16 @@ git push origin main
 5. **Description** : notes de version (ce texte apparaît dans la popup WordPress "Voir les détails")
 6. Cliquer **Publish release** (pas "Draft", pas "Pre-release")
 
-WordPress détectera la mise à jour dans les 12 heures. La notification apparaîtra dans **Extensions** comme pour tout plugin classique.
+La publication déclenche le workflow `.github/workflows/release.yml`, qui joint à la version le fichier `umani-cookie-control.zip` (dossier déjà nommé `umani-cookie-control`). Vérifier sa présence dans la page de la version une minute plus tard.
 
-> Le workflow `.github/workflows/release.yml`, qui joint une archive prête à l'emploi, ne se déclenche que pour les tags commençant par `v`. Avec la convention `2.x.x`, aucune archive n'est jointe à la version (voir Installation).
+WordPress détectera la mise à jour dans les 12 heures. La notification apparaîtra dans **Extensions** comme pour tout plugin classique.
 
 ### Forcer la détection immédiate
 
-Pour ne pas attendre le cache de 12 heures, supprimer les transients via WP-CLI :
+Pour ne pas attendre le cache de 12 heures, supprimer le transient via WP-CLI :
 
 ```bash
 wp transient delete umani_cc_github_release
-wp transient delete umani_cc_github_auth
 ```
 
 Ou via l'URL d'administration :
@@ -227,5 +201,5 @@ umani-cookie-control/
 ├── languages/                   # Traductions (.po / .mo)
 └── views/
     ├── banner.php               # Template HTML de la bannière
-    └── admin/                   # Pages et notices d'administration
+    └── admin/                   # Pages (tags, bannière) et notices d'administration
 ```

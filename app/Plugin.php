@@ -90,15 +90,21 @@ class Plugin
 
     private function initUpdater(): void
     {
-        $username = get_option($this->slug . '-username');
-        $token = get_option($this->slug . '-token');
+        add_action('admin_init', function () {
+            $this->removeLegacyUpdaterSettings();
+            new Updater(UMANI_CC_FILE, UMANI_CC_DIR);
+        }, 20);
+    }
 
-        if (!$username || !$token) {
+    private function removeLegacyUpdaterSettings(): void
+    {
+        if (get_option($this->slug . '-token') === false) {
             return;
         }
 
-        add_action('admin_init', function () use ($username, $token) {
-            new Updater(UMANI_CC_FILE, UMANI_CC_DIR, $username, $token);
-        }, 20);
+        foreach (['username', 'token', 'server'] as $field) {
+            delete_option($this->slug . '-' . $field);
+        }
+        delete_transient('umani_cc_github_auth');
     }
 }

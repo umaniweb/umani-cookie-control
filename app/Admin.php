@@ -42,15 +42,6 @@ class Admin
             $this->slug . '-banner',
             [$this, 'renderBannerPage']
         );
-
-        add_submenu_page(
-            $this->slug . '-code-insertion',
-            'Mise à jour',
-            'Mise à jour',
-            'manage_options',
-            $this->slug . '-updater-settings',
-            [$this, 'renderUpdaterPage']
-        );
     }
 
     public function renderCodeInsertionPage(): void
@@ -65,11 +56,6 @@ class Admin
         $state = $this->getSetupState();
         $this->addBannerNotices($state);
         include UMANI_CC_DIR . '/views/admin/page-banner.php';
-    }
-
-    public function renderUpdaterPage(): void
-    {
-        include UMANI_CC_DIR . '/views/admin/page-updater.php';
     }
 
     public function renderForm(string $formName): void

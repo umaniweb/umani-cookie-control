@@ -197,33 +197,4 @@ return [
             ],
         ],
     ],
-    'updater-settings' => [
-        'section_title'       => 'Connexion GitHub',
-        'section_description' => 'Identifiants utilisés pour vérifier la présence d\'une nouvelle version du plugin et la télécharger. Sans ces informations, aucune mise à jour automatique n\'est proposée.',
-        'page'                => 'updater-settings',
-        'fields'              => [
-            'username' => [
-                'type'       => 'string',
-                'render'     => 'input',
-                'input_type' => 'text',
-                'label'      => 'Nom d\'utilisateur GitHub',
-                'sanitize'   => 'sanitize_text_field',
-            ],
-            'token' => [
-                'type'        => 'string',
-                'render'      => 'input',
-                'input_type'  => 'password',
-                'label'       => 'Token d\'accès GitHub',
-                'description' => 'Token personnel disposant de l\'accès en lecture au dépôt du plugin.',
-                'sanitize'    => 'sanitize_text_field',
-            ],
-            'server' => [
-                'type'       => 'string',
-                'render'     => 'input',
-                'input_type' => 'url',
-                'label'      => 'URL du serveur',
-                'sanitize'   => 'sanitize_url',
-            ],
-        ],
-    ],
 ];

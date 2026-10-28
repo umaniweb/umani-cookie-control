@@ -10,31 +10,21 @@ class Updater
     private string $pluginDirPath;
     private string $pluginFile;
     private array $pluginData = [];
-    private string $gitHubUsername;
-    private string $repositoryName;
     private ?array $githubAPIResult = null;
-    private string $accessToken;
     private ?string $zipballUrl = null;
     private bool $pluginActivated = false;
 
+    private const REPOSITORY = 'umaniweb/umani-cookie-control';
     private const TRANSIENT_RELEASE = 'umani_cc_github_release';
-    private const TRANSIENT_AUTH = 'umani_cc_github_auth';
     private const TRANSIENT_TTL = 43200; // 12 hours
 
-    public function __construct(string $file, string $dir, string $gitHubUsername, string $accessToken)
+    public function __construct(string $file, string $dir)
     {
         $this->pluginSlug = plugin_basename($dir);
         $this->pluginDirPath = plugin_dir_path($file);
         $this->pluginFile = plugin_basename($file);
-        $this->gitHubUsername = $gitHubUsername;
-        $this->repositoryName = 'umani-cookie-control';
-        $this->accessToken = $accessToken;
 
         $this->initPluginData($file);
-
-        if (!$this->isAuthenticated()) {
-            return;
-        }
 
         add_filter('pre_set_site_transient_update_plugins', [$this, 'setTransient'], 10, 1);
         add_filter('plugins_api', [$this, 'setPluginInfo'], 10, 3);
@@ -51,23 +41,6 @@ class Updater
         $this->pluginData = \get_plugin_data($file);
     }
 
-    private function isAuthenticated(): bool
-    {
-        $cached = get_transient(self::TRANSIENT_AUTH);
-        if ($cached !== false) {
-            return (bool) $cached;
-        }
-
-        $response = wp_remote_get('https://api.github.com/user', [
-            'headers' => ['Authorization' => 'token ' . $this->accessToken],
-        ]);
-
-        $isAuth = !is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200;
-        set_transient(self::TRANSIENT_AUTH, $isAuth ? 1 : 0, self::TRANSIENT_TTL);
-
-        return $isAuth;
-    }
-
     private function getRepoReleaseInfo(): void
     {
         if ($this->githubAPIResult !== null) {
@@ -81,14 +54,8 @@ class Updater
             return;
         }
 
-        $url = sprintf(
-            'https://api.github.com/repos/%s/%s/releases/latest',
-            $this->gitHubUsername,
-            $this->repositoryName
-        );
-
-        $response = wp_remote_get($url, [
-            'headers' => ['Authorization' => 'token ' . $this->accessToken],
+        $response = wp_remote_get('https://api.github.com/repos/' . self::REPOSITORY . '/releases/latest', [
+            'headers' => ['Accept' => 'application/vnd.github+json'],
         ]);
 
         if (is_wp_error($response)) {
@@ -183,6 +150,10 @@ class Updater
     public function postInstall($true, $hookExtra, $result)
     {
         global $wp_filesystem;
+
+        if (($hookExtra['plugin'] ?? '') !== $this->pluginFile) {
+            return $true;
+        }
 
         $wp_filesystem->move($result['destination'], $this->pluginDirPath);
         $result['destination'] = $this->pluginDirPath;

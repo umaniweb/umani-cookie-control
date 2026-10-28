@@ -1,23 +1,25 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Creer le zip
         run: |
           mkdir -p umani-cookie-control
-          rsync -av --exclude='.git' --exclude='.github' . umani-cookie-control/
-          zip -r umani-cookie-control.zip umani-cookie-control/
+          rsync -a --exclude='/.git' --exclude='/.github' --exclude='/umani-cookie-control/' . umani-cookie-control/
+          zip -qr umani-cookie-control.zip umani-cookie-control/
 
       - name: Attacher au release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: umani-cookie-control.zip
