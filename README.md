@@ -6,7 +6,7 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 
 ## Fonctionnalités
 
-- Bannière flottante configurable (couleurs, textes, position)
+- Bannière de consentement configurable (texte, libellés des boutons, couleurs)
 - **Consent Mode v2** complet : `ad_storage`, `ad_user_data`, `ad_personalization`, `analytics_storage`, `personalization_storage`, `functionality_storage`, `security_storage`
 - Choix granulaire par catégorie : **Nécessaires** · **Analytiques** · **Marketing**
 - Compatible **WPML** (textes multilingues)
@@ -26,12 +26,17 @@ Plugin WordPress de bannière de consentement RGPD avec **Google Consent Mode v2
 
 ## Installation
 
-1. Télécharger la [dernière release](../../releases/latest) (fichier `.zip`)
-2. Dans WordPress : **Extensions → Ajouter → Téléverser une extension**
-3. Activer le plugin
-4. Configurer via le menu **Cookies** dans l'administration
+Les versions publiées ne contiennent pas de fichier `.zip` prêt à l'emploi : seule l'archive des sources générée par GitHub est disponible, et son dossier porte un nom du type `umaniweb-umani-cookie-control-<commit>`. Le dossier du plugin doit s'appeler exactement `umani-cookie-control`, sans quoi les mises à jour ne sont pas détectées.
 
-> Le dossier `vendor/` (autoload Composer) est inclus dans le dépôt — aucune commande `composer install` n'est nécessaire après installation.
+1. Télécharger l'archive **Source code (zip)** de la [dernière version](../../releases/latest)
+2. Décompresser l'archive et renommer le dossier obtenu en `umani-cookie-control`
+3. Au choix :
+   - recompresser ce dossier, puis dans WordPress : **Extensions → Ajouter → Téléverser une extension**
+   - ou le copier dans le dossier des extensions (`wp-content/plugins/`, ou `web/app/plugins/` sur Bedrock)
+4. Activer le plugin
+5. Configurer via le menu **Cookies** dans l'administration
+
+> Le dossier `vendor/` (autoload Composer) est inclus dans le dépôt : aucune commande `composer install` n'est nécessaire après installation.
 
 ---
 
@@ -48,7 +53,9 @@ Deux façons de déclarer le tag, au choix :
 | Champ **Identifiant du tag** | Cas courant. Saisir `GTM-XXXXXXX` ou `G-XXXXXXXXXX` : le snippet correspondant est généré et inséré automatiquement, avec le `<noscript>` de Tag Manager le cas échéant. |
 | Champ **Balise `<head>`** | Snippet non standard, ou solution de mesure autre que Google. Coller le code tel quel. |
 
-Dans les deux cas, le plugin initialise le Consent Mode v2 **avant** le tag : il n'est pas nécessaire de l'inclure dans le snippet.
+Le champ **Balise `<body>`** reçoit le code à placer juste après l'ouverture de `<body>`.
+
+Dans tous les cas, le plugin initialise le Consent Mode v2 **avant** le tag : il n'est pas nécessaire de l'inclure dans le snippet.
 
 Le Consent Mode v2 est compris à l'identique par Tag Manager et par `gtag.js`. Un identifiant Analytics 4 seul suffit donc à faire fonctionner la bannière, sans conteneur Tag Manager.
 
@@ -64,7 +71,13 @@ Le formulaire n'apparaît que si un tag est configuré et si une page de politiq
 - Une page de politique de confidentialité est publiée dans **Réglages > Vie privée**
 - La case **Activer la bannière** est cochée
 
-Options disponibles : texte, libellés des boutons, couleurs de fond / texte / bouton.
+Options disponibles :
+
+| Groupe | Champs |
+|---|---|
+| Texte | Texte de la bannière |
+| Boutons | Politique, Accepter tout, Refuser, Paramétrer, Sauvegarder les préférences |
+| Couleurs | Fond, texte, lien, fond du bouton, texte du bouton |
 
 ### 3. Traduction (WPML)
 
@@ -72,19 +85,38 @@ Avec WPML installé, les textes de la bannière peuvent être saisis par langue 
 
 ---
 
+## Comportement en façade
+
+Chaque catégorie accorde ses signaux Consent Mode :
+
+| Catégorie | Signaux | Par défaut |
+|---|---|---|
+| Nécessaires | `security_storage`, `functionality_storage` | toujours accordés |
+| Analytiques | `analytics_storage`, `personalization_storage` | refusés |
+| Marketing | `ad_storage`, `ad_user_data`, `ad_personalization` | refusés |
+
+- Les signaux par défaut sont posés avant le chargement du tag, puis mis à jour selon le choix du visiteur.
+- Le choix est enregistré dans le cookie `umani_consent` (`Secure`, `SameSite=Lax`) : 365 jours si au moins une catégorie facultative est acceptée, 1 jour si tout est refusé. La bannière réapparaît donc le lendemain d'un refus total.
+- Une fois le choix fait, la bannière n'est plus affichée sur les pages suivantes.
+- Aucun lien ne permet pour l'instant de rouvrir les préférences : pour changer d'avis, le visiteur supprime le cookie `umani_consent` de son navigateur.
+
+---
+
 ## Mises à jour automatiques
 
-Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par le dépôt officiel WordPress.
+Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par le dépôt officiel WordPress. Sans nom d'utilisateur ni token, aucune mise à jour n'est proposée.
 
-### Configurer le token d'accès
+### Configurer l'accès
 
 **Cookies → Mise à jour**
 
 | Champ | Description |
 |---|---|
-| Token d'accès GitHub | Personal Access Token (PAT) avec scope `repo` (voir guide ci-dessous) |
-| Nom d'utilisateur GitHub | Username GitHub du propriétaire du dépôt (ex : `umaniweb`) |
-| URL du serveur | Non utilisé — laisser vide |
+| Nom d'utilisateur GitHub | Propriétaire du dépôt : `umaniweb` |
+| Token d'accès GitHub | Personal Access Token (classic) **sans aucune portée** (voir guide ci-dessous) |
+| URL du serveur | Non utilisé, laisser vide |
+
+> Le dépôt étant public, le token n'a besoin d'aucun droit : il sert seulement à identifier les appels à l'API GitHub. Il est enregistré en clair dans la base de données du site, et sa valeur figure dans le code HTML de la page de réglages, lisible par tout administrateur. Ne jamais lui attribuer la portée `repo`, ni aucune autre.
 
 #### Créer un Personal Access Token sur GitHub
 
@@ -92,14 +124,15 @@ Le plugin se met à jour directement depuis ce dépôt GitHub, sans passer par l
    *(paramètres du compte, pas du dépôt)*
 2. Dans le menu de gauche, tout en bas : **Developer settings**
 3. **Personal access tokens → Tokens (classic)**
-   *(ne pas utiliser "Fine-grained tokens" — non supporté par l'Updater)*
+   *(ne pas utiliser "Fine-grained tokens", non supporté par l'Updater)*
 4. Cliquer **Generate new token → Generate new token (classic)**
 5. Dans le champ **Note**, saisir un nom descriptif, par exemple : `umani-cookie-control-updater`
-6. Dans **Select scopes**, cocher uniquement **`repo`** (accès complet aux dépôts)
-7. Cliquer **Generate token** en bas de page
-8. **Copier immédiatement le token affiché** — il ne sera plus visible après avoir quitté la page
+6. Dans **Expiration**, choisir **No expiration** : un token expiré interrompt les mises à jour sans avertissement
+7. Dans **Select scopes**, ne cocher **aucune case**
+8. Cliquer **Generate token** en bas de page
+9. **Copier immédiatement le token affiché** : il ne sera plus visible après avoir quitté la page
 
-Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour du plugin.
+Coller ce token dans le champ **Token d'accès GitHub** de la page Mise à jour du plugin. Le même token peut servir sur tous les sites.
 
 ---
 
@@ -144,6 +177,8 @@ git push origin main
 
 WordPress détectera la mise à jour dans les 12 heures. La notification apparaîtra dans **Extensions** comme pour tout plugin classique.
 
+> Le workflow `.github/workflows/release.yml`, qui joint une archive prête à l'emploi, ne se déclenche que pour les tags commençant par `v`. Avec la convention `2.x.x`, aucune archive n'est jointe à la version (voir Installation).
+
 ### Forcer la détection immédiate
 
 Pour ne pas attendre le cache de 12 heures, supprimer les transients via WP-CLI :
@@ -185,10 +220,12 @@ umani-cookie-control/
 │       └── Updater.php          # Mise à jour depuis GitHub
 ├── css/
 │   └── banner.css               # Styles de la bannière
+├── img/                         # Icônes de la bannière
 ├── js/
 │   ├── consent.js               # Logique consentement (vanilla JS)
 │   └── admin.js                 # Scripts d'administration
+├── languages/                   # Traductions (.po / .mo)
 └── views/
     ├── banner.php               # Template HTML de la bannière
-    └── admin/                   # Templates des pages admin
+    └── admin/                   # Pages et notices d'administration
 ```
